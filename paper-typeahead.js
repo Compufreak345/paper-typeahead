@@ -83,7 +83,7 @@
       filteredItems: {
         type: Array,
         computed: '_getFiltered(data.*, typedValue, filterFn, maxResults,' +
-            'typeaheadDisabled)',
+        'typeaheadDisabled)',
         notify: true
       },
 
@@ -92,14 +92,21 @@
         value: function() {
           return function(data, value) {
             var r = RegExp(value, 'i');
-
+            var getVal = this.getValFn;
             if (value === '') {
               return this.showEmptyResults ? data : [];
             }
-
             return data.filter(function(v) {
-              return (r.test(v) ? v : null);
+              return (r.test(getVal(v)) ? getVal(v) : null);
             });
+          };
+        }
+      },
+      getValFn: {
+        type: Function,
+        value: function() {
+          return function(value) {
+            return value;
           };
         }
       },
@@ -124,7 +131,6 @@
       'focus': '_onFocus',
       'blur': '_onBlur',
     },
-
     /**
      * @private
      * @param {Event} e
@@ -143,7 +149,7 @@
       if (!this._hideResults) {
         this.selectPrevious();
         this.value = this.selected && this.arrowsUpdateInput ?
-          this.filteredItems[this.selected - 1] : this.typedValue;
+            this.filteredItems[this.selected - 1] : this.typedValue;
       }
     },
 
@@ -154,7 +160,7 @@
       if (!this._hideResults) {
         this.selectNext();
         this.value = this.selected && this.arrowsUpdateInput ?
-          this.filteredItems[this.selected - 1] : this.typedValue;
+            this.filteredItems[this.selected - 1] : this.typedValue;
         // if there are results and they are hide
       } else if (this.filteredItems.length) {
         // show them and select the first one
@@ -206,18 +212,18 @@
      * @return {Array}
      */
     _getFiltered: function(data,
-                      typedValue,
-                      filterFn,
-                      maxResults,
-                      typeaheadDisabled) {
+                           typedValue,
+                           filterFn,
+                           maxResults,
+                           typeaheadDisabled) {
       if (typeaheadDisabled) { return []; }
       return filterFn.call(this, data.base, typedValue)
-        .slice(0, maxResults);
+          .slice(0, maxResults);
     },
 
     _updateItems: function() {
       this._setItems(Array.from(
-            Polymer.dom(this.root).querySelectorAll('.selectable')));
+          Polymer.dom(this.root).querySelectorAll('.selectable')));
       this.selected = 1;
       this._updateSelected();
     },
@@ -273,7 +279,6 @@
     _mouseDownItems: function(e) {
       e.preventDefault();
     },
-
     /**
      * @private
      */

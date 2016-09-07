@@ -69,7 +69,7 @@ Custom property | Description | Default
         border-radius: 0 0 2px 2px;
         width: 100%;
         margin-top: 2px;
-        position: absolute;
+        position: relative;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
         max-height: var(--paper-typeahead-results-layer-max-height, auto);
@@ -101,50 +101,50 @@ Custom property | Description | Default
       }
     </style>
     <paper-input-container
-      class="selectable"
-      no-label-float="[[noLabelFloat]]"
-      always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]"
-      auto-validate$="[[autoValidate]]"
-      disabled$="[[disabled]]"
-      invalid="[[invalid]]">
+            class="selectable"
+            no-label-float="[[noLabelFloat]]"
+            always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]"
+            auto-validate$="[[autoValidate]]"
+            disabled$="[[disabled]]"
+            invalid="[[invalid]]">
       <label hidden$="[[!label]]" on-tap="_onLabelTap">[[label]]</label>
       <input is="iron-input" id="input"
-        aria-labelledby$="[[_ariaLabelledBy]]"
-        aria-describedby$="[[_ariaDescribedBy]]"
-        disabled$="[[disabled]]"
-        bind-value="{{value}}"
-        value="{{typedValue::input}}"
-        invalid="{{invalid}}"
-        prevent-invalid-input="[[preventInvalidInput]]"
-        allowed-pattern="[[allowedPattern]]"
-        validator="[[validator]]"
-        type$="[[type]]"
-        pattern$="[[pattern]]"
-        required$="[[required]]"
-        autocomplete$="[[autocomplete]]"
-        autofocus$="[[autofocus]]"
-        inputmode$="[[inputmode]]"
-        minlength$="[[minlength]]"
-        maxlength$="[[maxlength]]"
-        min$="[[min]]"
-        max$="[[max]]"
-        step$="[[step]]"
-        name$="[[name]]"
-        placeholder$="[[placeholder]]"
-        readonly$="[[readonly]]"
-        size$="[[size]]"
-        autocapitalize$="[[autocapitalize]]"
-        autocorrect$="on"
-        on-change="_onChange">
-        <paper-material hidden$="[[_hideResults]]" elevation="[[elevation]]"
-            on-mousedown="_mouseDownItems" on-mouseleave="_mouseleaveItems" tabindex="-1">
-          <template is="dom-repeat" sort="[[sortFn]]" items="[[filteredItems]]" on-dom-change="_updateItems">
-            <paper-item on-mouseenter="_mouseenterItem" class="selectable" tabindex="-1">
-              <span>[[item]]</span>
-            </paper-item>
-          </template>
-        </paper-material>
-        <paper-input-error tabindex="-1">[[errorMessage]]</paper-input-error>
+             aria-labelledby$="[[_ariaLabelledBy]]"
+             aria-describedby$="[[_ariaDescribedBy]]"
+             disabled$="[[disabled]]"
+             bind-value="{{value}}"
+             value="{{typedValue::input}}"
+             invalid="{{invalid}}"
+             prevent-invalid-input="[[preventInvalidInput]]"
+             allowed-pattern="[[allowedPattern]]"
+             validator="[[validator]]"
+             type$="[[type]]"
+             pattern$="[[pattern]]"
+             required$="[[required]]"
+             autocomplete$="[[autocomplete]]"
+             autofocus$="[[autofocus]]"
+             inputmode$="[[inputmode]]"
+             minlength$="[[minlength]]"
+             maxlength$="[[maxlength]]"
+             min$="[[min]]"
+             max$="[[max]]"
+             step$="[[step]]"
+             name$="[[name]]"
+             placeholder$="[[placeholder]]"
+             readonly$="[[readonly]]"
+             size$="[[size]]"
+             autocapitalize$="[[autocapitalize]]"
+             autocorrect$="on"
+             on-change="_onChange">
+      <paper-material hidden$="[[_hideResults]]" elevation="[[elevation]]"
+                      on-mousedown="_mouseDownItems" on-mouseleave="_mouseleaveItems" tabindex="-1">
+        <template is="dom-repeat" sort="[[sortFn]]" items="[[filteredItems]]" on-dom-change="_updateItems">
+          <paper-item on-mouseenter="_mouseenterItem" class="selectable" tabindex="-1" >
+            <span>[[item]]</span>
+          </paper-item>
+        </template>
+      </paper-material>
+      <paper-input-error tabindex="-1">[[errorMessage]]</paper-input-error>
     </paper-input-container>
   </template>
 </dom-module>
