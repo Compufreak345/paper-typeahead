@@ -1,5 +1,16 @@
 <!--
 
+Copyright 2016 Google Inc. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
 ### Styling
 
 The following custom properties and mixins are also available for styling:
@@ -58,7 +69,7 @@ Custom property | Description | Default
         border-radius: 0 0 2px 2px;
         width: 100%;
         margin-top: 2px;
-        position: absolute;
+        position: relative;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
         max-height: var(--paper-typeahead-results-layer-max-height, auto);
@@ -85,54 +96,55 @@ Custom property | Description | Default
       paper-item:focus:before {
         display: none;
       }
+      [hidden] {
+        display:none;
+      }
     </style>
     <paper-input-container
-      class="selectable"
-      no-label-float="[[noLabelFloat]]"
-      always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]"
-      auto-validate$="[[autoValidate]]"
-      disabled$="[[disabled]]"
-      invalid="[[invalid]]">
-      <label hidden$="[[!label]]">[[label]]</label>
+            class="selectable"
+            no-label-float="[[noLabelFloat]]"
+            always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]"
+            auto-validate$="[[autoValidate]]"
+            disabled$="[[disabled]]"
+            invalid="[[invalid]]">
+      <label hidden$="[[!label]]" on-tap="_onLabelTap">[[label]]</label>
       <input is="iron-input" id="input"
-        aria-labelledby$="[[_ariaLabelledBy]]"
-        aria-describedby$="[[_ariaDescribedBy]]"
-        disabled$="[[disabled]]"
-        bind-value="{{value}}"
-        value="{{typedValue::input}}"
-        invalid="{{invalid}}"
-        prevent-invalid-input="[[preventInvalidInput]]"
-        allowed-pattern="[[allowedPattern]]"
-        validator="[[validator]]"
-        type$="[[type]]"
-        pattern$="[[pattern]]"
-        required$="[[required]]"
-        autocomplete$="[[autocomplete]]"
-        autofocus$="[[autofocus]]"
-        inputmode$="[[inputmode]]"
-        minlength$="[[minlength]]"
-        maxlength$="[[maxlength]]"
-        min$="[[min]]"
-        max$="[[max]]"
-        step$="[[step]]"
-        name$="[[name]]"
-        placeholder$="[[placeholder]]"
-        readonly$="[[readonly]]"
-        size$="[[size]]"
-        autocapitalize$="[[autocapitalize]]"
-        autocorrect$="on"
-        on-change="_onChange">
-        <template is="dom-if" if="[[!_hideResults]]">
-          <paper-material elevation="[[elevation]]"
-              on-mousedown="_mouseDownItems" on-mouseleave="_mouseleaveItems">
-            <template is="dom-repeat" items="[[filteredItems]]">
-              <paper-item on-mouseenter="_mouseenterItem" class="selectable">
-                <span>[[item]]</span>
-              </paper-item>
-            </template>
-          </paper-material>
+             aria-labelledby$="[[_ariaLabelledBy]]"
+             aria-describedby$="[[_ariaDescribedBy]]"
+             disabled$="[[disabled]]"
+             bind-value="{{value}}"
+             value="{{typedValue::input}}"
+             invalid="{{invalid}}"
+             prevent-invalid-input="[[preventInvalidInput]]"
+             allowed-pattern="[[allowedPattern]]"
+             validator="[[validator]]"
+             type$="[[type]]"
+             pattern$="[[pattern]]"
+             required$="[[required]]"
+             autocomplete$="[[autocomplete]]"
+             autofocus$="[[autofocus]]"
+             inputmode$="[[inputmode]]"
+             minlength$="[[minlength]]"
+             maxlength$="[[maxlength]]"
+             min$="[[min]]"
+             max$="[[max]]"
+             step$="[[step]]"
+             name$="[[name]]"
+             placeholder$="[[placeholder]]"
+             readonly$="[[readonly]]"
+             size$="[[size]]"
+             autocapitalize$="[[autocapitalize]]"
+             autocorrect$="on"
+             on-change="_onChange">
+      <paper-material hidden$="[[_hideResults]]" elevation="[[elevation]]"
+                      on-mousedown="_mouseDownItems" on-mouseleave="_mouseleaveItems" tabindex="-1">
+        <template is="dom-repeat" sort="[[sortFn]]" items="[[filteredItems]]" on-dom-change="_updateItems">
+          <paper-item on-mouseenter="_mouseenterItem" class="selectable" tabindex="-1" >
+            <span>[[getValFn(item)]]</span>
+          </paper-item>
         </template>
-        <paper-input-error>[[errorMessage]]</paper-input-error>
+      </paper-material>
+      <paper-input-error tabindex="-1">[[errorMessage]]</paper-input-error>
     </paper-input-container>
   </template>
 </dom-module>

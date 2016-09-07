@@ -1,3 +1,19 @@
+/**
+ * Copyright 2016 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 (function() {
   'use strict';
 
@@ -5,7 +21,10 @@
     is: 'paper-typeahead',
 
     behaviors: [
-      Polymer.IronA11yKeysBehavior,
+      //Commented out because it causes duplicate
+      //key event registrations... This should be fixed when polymer
+      //is updated:
+      //Polymer.IronA11yKeysBehavior,
       Polymer.IronSelectableBehavior,
       Polymer.PaperInputBehavior,
       Polymer.IronControlState,
@@ -13,6 +32,10 @@
     ],
 
     properties: {
+      sortFn: {
+        type: Function
+      },
+
       arrowsUpdateInput: {
         type: Boolean,
         value: false
@@ -69,14 +92,21 @@
         value: function() {
           return function(data, value) {
             var r = RegExp(value, 'i');
-
+            var getVal = this.getValFn;
             if (value === '') {
               return this.showEmptyResults ? data : [];
             }
-
             return data.filter(function(v) {
-              return (r.test(v) ? v : null);
+              return (r.test(getVal(v)) ? v : null);
             });
+          };
+        }
+      },
+      getValFn: {
+        type: Function,
+        value: function() {
+          return function(value) {
+            return value;
           };
         }
       },
@@ -92,16 +122,15 @@
     keyBindings: {
       'up': '_upPressed',
       'down': '_downPressed',
-      'esc': '_escPressed',
+      'esc': 'closeResults',
       'enter': '_enterPressed'
     },
 
     listeners: {
       'iron-activate': '_itemPressed',
       'focus': '_onFocus',
-      'blur': '_onBlur',
+      'blur': '_onBlur'
     },
-
     /**
      * @private
      * @param {Event} e
@@ -120,7 +149,7 @@
       if (!this._hideResults) {
         this.selectPrevious();
         this.value = this.selected && this.arrowsUpdateInput ?
-          this.filteredItems[this.selected - 1] : this.typedValue;
+            this.filteredItems[this.selected - 1] : this.typedValue;
       }
     },
 
@@ -131,20 +160,13 @@
       if (!this._hideResults) {
         this.selectNext();
         this.value = this.selected && this.arrowsUpdateInput ?
-          this.filteredItems[this.selected - 1] : this.typedValue;
-      // if there are results and they are hide
+            this.filteredItems[this.selected - 1] : this.typedValue;
+        // if there are results and they are hide
       } else if (this.filteredItems.length) {
-        // just show them
+        // show them and select the first one
         this._hideResults = false;
+        this.selected = 1;
       }
-    },
-
-    /**
-     * @private
-     */
-    _escPressed: function() {
-      this.selected = 0;
-      this._hideResults = true;
     },
 
     /**
@@ -154,7 +176,7 @@
       // -1 since paper-input-container is part of
       // selectable array, index is shifted
       if (this.selected > 0) {
-        this.selectResult(this.selected - 1);
+        return this.selectResult(this.selected - 1);
       }
     },
 
@@ -163,10 +185,6 @@
      */
     _typedValueChanged: function() {
       var hasItems = this.filteredItems && this.filteredItems.length;
-      if (hasItems) {
-        this.selected = 1;
-      }
-
       this._hideResults = !hasItems;
     },
 
@@ -186,17 +204,28 @@
 
     /**
      * @private
+     * @param {{base: Array}} data
+     * @param {string} typedValue
+     * @param {Function<Array>} filterFn
+     * @param {number} maxResults
+     * @param {boolean} typeaheadDisabled
      * @return {Array}
      */
-    _getFiltered: function(
-      data, typedValue, filterFn, maxResults, typeaheadDisabled) {
+    _getFiltered: function(data,
+                           typedValue,
+                           filterFn,
+                           maxResults,
+                           typeaheadDisabled) {
       if (typeaheadDisabled) { return []; }
       return filterFn.call(this, data.base, typedValue)
-        .slice(0, maxResults);
+          .slice(0, maxResults);
     },
 
-    get items() {
-      return Array.from(Polymer.dom(this.root).querySelectorAll('.selectable'));
+    _updateItems: function() {
+      this._setItems(Array.from(
+          Polymer.dom(this.root).querySelectorAll('.selectable')));
+      this.selected = 1;
+      this._updateSelected();
     },
 
     /**
@@ -206,17 +235,26 @@
      * @param {!number} itemIndex The index of the item to select
      */
     selectResult: function(itemIndex) {
-      this.typedValue = this.value = this.filteredItems[itemIndex];
+      // Since the results can be sorted we need to normalize here.
+      var targetResult = this.filteredItems.sort(
+          this.sortFn || function() {})[itemIndex];
 
-      this.fire('selected', {target: this.value});
-      this.closeResults();
+      if (targetResult === undefined) {
+        this.fire('customvalentered', {target: this.typedValue});
+      } else {
+        this.value = targetResult;
+        this.typedValue=""; // workaround for input not notifying about change if we select exactly what was written before.
+        this.typedValue = this.getValFn(targetResult);
+        this.fire('selected', {target: this.value});
+        this.closeResults();
+      }
     },
 
     /**
      * Manually display the results if the filteredItems array is not empty.
      *
      * @return {boolean} True if the results are displayed.
-    */
+     */
     tryDisplayResults: function() {
       var items = this.filteredItems;
 
@@ -225,13 +263,6 @@
       }
 
       return !this._hideResults;
-    },
-
-    /**
-     * Manually hide the results.
-     */
-    hideResults: function() {
-      this._hideResults = true;
     },
 
     /**
@@ -250,7 +281,6 @@
     _mouseDownItems: function(e) {
       e.preventDefault();
     },
-
     /**
      * @private
      */
@@ -263,6 +293,13 @@
      */
     _onBlur: function() {
       this.closeResults();
+    },
+
+    /**
+     * @private
+     */
+    _onLabelTap: function() {
+      this.$.input.focus();
     },
   });
 })();
