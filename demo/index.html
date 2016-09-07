@@ -21,7 +21,8 @@
     <iron-ajax url="data/countries.json"
                last-response="{{countryData}}" auto></iron-ajax>
     <paper-typeahead value="{{country}}" get-val-fn="[[getCountry]]" label="which country?" data="[[countryData]]"></paper-typeahead>
-    <div>[[_getCountryDetails(country)]]</div>
+    <paper-typeahead value="{{countryCode}}" get-val-fn="[[getCountryCode]]" label="which countryCode?" data="[[countryData]]"></paper-typeahead>
+
   </template>
 
   <script>
@@ -36,17 +37,43 @@
             return function (value) {
               if (value && value.name)
                 return value.name;
+              debugger;
               return value;
             };
           }
         },
-        countryData:Object
+        getCountryCode: {
+          type: Function,
+          value: function () {
+            return function (value) {
+              if (value && value.code)
+                return value.code;
+
+              return value;
+            };
+          }
+        },
+        countryData:Object,
+        country: {type:Object, observer:"_countryChanged"},
+        countryCode: {type:Object, observer:"_countryCodeChanged"}
+
       },
       _getCountryDetails: function(c) {
         if(c=="") return;
         if(typeof(c)=="string") return "No additional data for country " + c;
         return "The country code for " + c.name + " is AF";
+      },
+      _countryChanged: function(c) {
+        if(c && c.code) {
+          this.countryCode = c.code;
+        }
+      },
+      _countryCodeChanged: function(c) {
+        if(c && c.name) {
+          this.country = c.name;
+        }
       }
+
     });
 
   </script>

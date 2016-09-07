@@ -97,7 +97,7 @@
               return this.showEmptyResults ? data : [];
             }
             return data.filter(function(v) {
-              return (r.test(getVal(v)) ? getVal(v) : null);
+              return (r.test(getVal(v)) ? v : null);
             });
           };
         }
@@ -129,7 +129,7 @@
     listeners: {
       'iron-activate': '_itemPressed',
       'focus': '_onFocus',
-      'blur': '_onBlur',
+      'blur': '_onBlur'
     },
     /**
      * @private
@@ -243,6 +243,7 @@
         this.fire('customvalentered', {target: this.typedValue});
       } else {
         this.value = targetResult;
+        this.typedValue=""; // workaround for input not notifying about change if we select exactly what was written before.
         this.typedValue = this.getValFn(targetResult);
         this.fire('selected', {target: this.value});
         this.closeResults();
