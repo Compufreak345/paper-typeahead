@@ -140,7 +140,7 @@ Custom property | Description | Default
                       on-mousedown="_mouseDownItems" on-mouseleave="_mouseleaveItems" tabindex="-1">
         <template is="dom-repeat" sort="[[sortFn]]" items="[[filteredItems]]" on-dom-change="_updateItems">
           <paper-item on-mouseenter="_mouseenterItem" class="selectable" tabindex="-1" >
-            <span>[[item]]</span>
+            <span>[[getValFn(item)]]</span>
           </paper-item>
         </template>
       </paper-material>
