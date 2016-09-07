@@ -1,13 +1,56 @@
+<!-- Source of programming languages : https://github.com/scienceai/list-of-programming-languages
+(Apache license) https://github.com/scienceai/list-of-programming-languages/blob/master/LICENSE
+-->
 <html>
-  <head>
-    <link rel="import" href="../../polymer/polymer.html">
-    <link rel="import" href="../../iron-ajax/iron-ajax.html">
-    <link rel="import" href="../paper-typeahead.html">
-  </head>
-  <body>
-    <template id="sample" is="dom-bind">
-      <iron-ajax url="data/dogs.json" last-response="{{data}}" auto></iron-ajax>
-      <paper-typeahead label="which dog?" data="[[data]]"></paper-typeahead>
-    </template>
-  </body>
+<head>
+  <link rel="import" href="../../polymer/polymer.html">
+  <link rel="import" href="../../iron-ajax/iron-ajax.html">
+  <link rel="import" href="../paper-typeahead.html">
+</head>
+<body>
+<template id="sample" is="dom-bind">
+  <iron-ajax url="data/dogs.json" last-response="{{data}}" auto></iron-ajax>
+  <paper-typeahead label="which dog?" data="[[data]]"></paper-typeahead>
+
+  <language-picker></language-picker>
+
+</template>
+<dom-module id="language-picker">
+
+  <template>
+    <iron-ajax url="data/countries.json"
+               last-response="{{countryData}}" auto></iron-ajax>
+    <paper-typeahead value="{{country}}" get-val-fn="[[getCountry]]" label="which country?" data="[[countryData]]"></paper-typeahead>
+    <div>[[_getCountryDetails(country)]]</div>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'language-picker',
+      properties: {
+        getCountry: {
+          type: Function,
+          value: function () {
+            return function (value) {
+              if (value && value.name)
+                return value.name;
+              return value;
+            };
+          }
+        },
+        countryData:Object
+      },
+      _getCountryDetails: function(c) {
+        if(c=="") return;
+        if(typeof(c)=="string") return "No additional data for country " + c;
+        return "The country code for " + c.name + " is AF";
+      }
+    });
+
+  </script>
+
+</dom-module>
+</body>
 </html>

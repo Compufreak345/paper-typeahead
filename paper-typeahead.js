@@ -242,7 +242,8 @@
       if (targetResult === undefined) {
         this.fire('customvalentered', {target: this.typedValue});
       } else {
-        this.typedValue = this.value = targetResult;
+        this.value = targetResult;
+        this.typedValue = this.getValFn(targetResult);
         this.fire('selected', {target: this.value});
         this.closeResults();
       }
